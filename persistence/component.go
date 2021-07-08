@@ -16,6 +16,7 @@ type ComponentPersistor struct {
 
 type Component struct {
 	ComponentID string               `json:"id" bson:"_id"`
+	Name        string               `json:"name" bson:"name"`
 	Image       string               `json:"image" bson:"image"`
 	Children    []primitive.ObjectID `json:"children" bson:"children"`
 	IsChild     bool                 `json:"isChild" bson:"isChild"`
