@@ -1,0 +1,18 @@
+POST http://localhost:3000/vuement/component
+Content-Type: application/json
+
+{
+    "name": "Hallo",
+    "children": [],
+    "isChild": true,
+    "props": [
+        {
+            "name": "Timo",
+            "value": "test",
+            "description": "Hello",
+            "type": "ddd"
+        }
+    ]
+}
+
+###

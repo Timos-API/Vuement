@@ -3,6 +3,9 @@ package service
 import (
 	"Timos-API/Vuement/persistence"
 	"context"
+
+	"github.com/Timos-API/transformer"
+	"github.com/go-playground/validator"
 )
 
 type ComponentService struct {
@@ -14,13 +17,19 @@ func NewComponentService(p *persistence.ComponentPersistor) *ComponentService {
 }
 
 func (s *ComponentService) Create(ctx context.Context, component persistence.Component) (*persistence.Component, error) {
-	// TODO: Validate, Clean
-	return s.p.Create(ctx, component)
+	validate := validator.New()
+	err := validate.Struct(component)
+	if err != nil {
+		return nil, err
+	}
+
+	cleaned := transformer.Clean(component, "create")
+	return s.p.Create(ctx, cleaned)
 }
 
 func (s *ComponentService) Update(ctx context.Context, id string, component persistence.Component) (*persistence.Component, error) {
-	// TODO: Validate, Clean
-	return s.p.Update(ctx, id, component)
+	cleaned := transformer.Clean(component, "update")
+	return s.p.Update(ctx, id, cleaned)
 }
 
 func (s *ComponentService) Delete(ctx context.Context, id string) (bool, error) {

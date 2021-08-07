@@ -16,18 +16,18 @@ type ComponentPersistor struct {
 
 type Component struct {
 	ComponentID string               `json:"id" bson:"_id"`
-	Name        string               `json:"name" bson:"name"`
-	Image       string               `json:"image" bson:"image"`
-	Children    []primitive.ObjectID `json:"children" bson:"children"`
-	IsChild     bool                 `json:"isChild" bson:"isChild"`
-	Props       []ComponentProp      `json:"props" bson:"props"`
+	Name        string               `json:"name" bson:"name" keep:"update,create,omitempty" validate:"required,gt=2"`
+	Image       string               `json:"image" bson:"image" keep:"update,create,omitempty" validate:"omitempty,url"`
+	Children    []primitive.ObjectID `json:"children" bson:"children" keep:"update,create" validate:"required"`
+	IsChild     bool                 `json:"isChild" bson:"isChild" keep:"update,create,omitempty"`
+	Props       []ComponentProp      `json:"props" bson:"props" keep:"update,create" validate:"dive,required"`
 }
 
 type ComponentProp struct {
-	Name        string `json:"name" bson:"name"`
-	Value       string `json:"value" bson:"value"`
-	Description string `json:"description" bson:"description"`
-	Type        string `json:"type" bson:"type"`
+	Name        string `json:"name" bson:"name" keep:"update,create,omitempty" validate:"required,gt=2"`
+	Value       string `json:"value" bson:"value" keep:"update,create,omitempty" validate:"required,gt=2"`
+	Description string `json:"description" bson:"description" keep:"update,create,omitempty" validate:"required,gt=2"`
+	Type        string `json:"type" bson:"type" keep:"update,create,omitempty" validate:"required,gt=2"`
 }
 
 var (
@@ -40,23 +40,21 @@ func NewComponentPersistor(c *mongo.Collection) *ComponentPersistor {
 	return &ComponentPersistor{c}
 }
 
-func (p *ComponentPersistor) Create(ctx context.Context, component Component) (*Component, error) {
+func (p *ComponentPersistor) Create(ctx context.Context, component interface{}) (*Component, error) {
 	res, err := p.c.InsertOne(ctx, component)
 
 	if err != nil {
 		return nil, err
 	}
 
-	// check if everything is fine and oid is set
 	if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
-		// return message
 		return p.GetById(ctx, oid.Hex())
 	}
 
 	return nil, ErrInsertError
 }
 
-func (p *ComponentPersistor) Update(ctx context.Context, id string, component Component) (*Component, error) {
+func (p *ComponentPersistor) Update(ctx context.Context, id string, component interface{}) (*Component, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {

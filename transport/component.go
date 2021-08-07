@@ -24,7 +24,6 @@ func NewComponentTransporter(s *service.ComponentService) *ComponentTransporter 
 }
 
 func (c *ComponentTransporter) RegisterComponentRoutes(router *mux.Router) {
-
 	router.HandleFunc("/vuement/component", c.getComponents).Methods("GET")
 	router.HandleFunc("/vuement/component/{id}", c.getComponent).Methods("GET")
 	router.HandleFunc("/vuement/component", authenticator.Middleware(c.createComponent, authenticator.Guard().G("admin").P("vuement.create"))).Methods("POST")
