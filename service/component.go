@@ -28,6 +28,12 @@ func (s *ComponentService) Create(ctx context.Context, component persistence.Com
 }
 
 func (s *ComponentService) Update(ctx context.Context, id string, component persistence.Component) (*persistence.Component, error) {
+	validate := validator.New()
+	err := validate.Struct(component)
+	if err != nil {
+		return nil, err
+	}
+
 	cleaned := transformer.Clean(component, "update")
 	return s.p.Update(ctx, id, cleaned)
 }
